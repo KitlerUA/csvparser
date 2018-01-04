@@ -36,6 +36,7 @@ func (p *Parser) Parse(fileName string, delimiter rune, c chan policy.Policy, cE
 			Conditions:  policy.Condition{},
 			Effect:      records[i][4],
 			Resources:   []string{},
+			Row:         i,
 		}
 		//parse subjects
 		temp.Subjects = strings.Split(records[i][2], string(delimiter))

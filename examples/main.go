@@ -13,24 +13,36 @@ import (
 	"github.com/KitlerUA/CSVParser/policy"
 )
 
-const defaultCSVFileName = "examples/qwre.csv"
+const defaultCSVFileName = "policies.csv"
 const directoryNameForJSONs = "Policies"
 
 func main() {
 	parser := csvparser.Parser{}
+	//channel for getting Policies from parser.Parse
 	readerChan := make(chan policy.Policy, 4)
+	//channels for getting error from parser.Parse
 	errorChan := make(chan error)
+	//if no argument - use default filename
 	if len(os.Args) > 1 {
 		go parser.Parse(os.Args[1], ',', readerChan, errorChan)
 	} else {
+		log.Printf("No argument for filename. Use default filename")
 		go parser.Parse(defaultCSVFileName, ',', readerChan, errorChan)
 	}
+	//wait for error
 	if err := <-errorChan; err != nil {
 		log.Printf("Get parse error: %s", err)
 		return
 	}
 
+	uniquePolicies := make(map[string]struct{})
+	//if error == nil - just start receive Policies
 	for c := range readerChan {
+		if _, ok := uniquePolicies[c.Name]; ok {
+			log.Printf("Find duplicate for policy '%s' on row %d. Skipped", c.Name, c.Row)
+			continue
+		}
+		uniquePolicies[c.Name] = struct{}{}
 		marshaledPolicies, err := json.Marshal(&c)
 		if err != nil {
 			log.Printf("Cannot marshal csv: %s", err)

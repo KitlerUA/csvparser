@@ -39,7 +39,7 @@ func main() {
 	//if error == nil - just start receive Policies
 	for c := range readerChan {
 		if k, ok := uniquePolicies[c.Name]; ok {
-			log.Printf("Find duplicate for policy '%s' on rows %d and %d. Skipping %d", c.Name, k, c.Row, c.Row)
+			log.Printf("Find duplicate for policy '%s' on rows %d and %d. Skipping %d", c.Name, k+1, c.Row+1, c.Row+1)
 			continue
 		}
 		uniquePolicies[c.Name] = c.Row

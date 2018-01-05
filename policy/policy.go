@@ -8,7 +8,7 @@ type Policy struct {
 	Description string    `json:"description"`
 	Subjects    []string  `json:"subjects"`
 	Actions     []string  `json:"actions"`
-	Effect      string    ` json:"effect"`
+	Effect      string    `json:"effect"`
 	Conditions  Condition `json:"conditions"`
 	Resources   []string  `json:"resources"`
 

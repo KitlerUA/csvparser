@@ -9,52 +9,62 @@ import (
 
 	"bytes"
 
+	"path"
+
 	parser "github.com/KitlerUA/CSVParser/csvparser"
 	"github.com/KitlerUA/CSVParser/policy"
 )
 
-const defaultCSVFileName = "policies.csv"
-const directoryNameForJSONs = "Policies"
+const defaultCSVFileName = "List of Actions - Copy.xlsx"
 
 func main() {
-	//channel for getting Policies from parser.Parse
-	readerChan := make(chan policy.Policy, 4)
-	//channels for getting error from parser.Parse
-	errorChan := make(chan error)
-	//if no argument - use default filename
+
+	var m map[string][][]string
+	var err error
+	var ext string
+	var fileName string
 	if len(os.Args) > 1 {
-		go parser.Parse(os.Args[1], ',', readerChan, errorChan)
+		fileName = os.Args[1]
+		ext = path.Ext(fileName)
 	} else {
 		log.Printf("No argument for filename. Used default filename '%s'", defaultCSVFileName)
-		go parser.Parse(defaultCSVFileName, ',', readerChan, errorChan)
+		fileName = defaultCSVFileName
+		ext = path.Ext(fileName)
 	}
-	//wait for error
-	if err := <-errorChan; err != nil {
-		log.Printf("Get parse error: %s", err)
-		return
-	}
-	//policy and row (where policy was found)
-	uniquePolicies := make(map[string]int)
-	//if directory already exists we get error, but we need just skip this action, not panic
-	if err := os.Mkdir(directoryNameForJSONs, os.ModePerm); err != nil && !os.IsExist(err) {
-		log.Fatalf("Cannot create directory for policies: %s", err)
-	}
-	for c := range readerChan {
-		if k, ok := uniquePolicies[c.Name]; ok {
-			log.Printf("Find duplicate for policy '%s' on rows %d and %d. Skipping %d", c.Name, k+1, c.Row+1, c.Row+1)
-			continue
-		}
-		uniquePolicies[c.Name] = c.Row
-		marshaledPolicies, err := json.Marshal(&c)
-		if err != nil {
-			log.Fatalf("Cannot marshal policy '%s' : %s", c.Name, err)
-		}
-		newName := ReplaceRuneWith(c.Name, ':', '_')
-		if err = ioutil.WriteFile(directoryNameForJSONs+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
-			log.Fatalf("Cannot save json file for policy '%s': %s", c.Name, err)
-		}
 
+	if ext == ".csv" {
+		m, err = parser.CSV(fileName, ';')
+		if err != nil {
+			log.Fatalf("Cannot parse csv: %s", err)
+		}
 	}
+	if ext == ".xlsx" {
+		m, err = parser.XLSX(fileName)
+		if err != nil {
+			log.Fatalf("Cannot parse xlsx: %s", err)
+		}
+	}
+	for k := range m {
+		//channel for getting Policies from parser.Parse
+		readerChan := make(chan policy.Policy, 4)
+		go parser.Parse(m[k], readerChan)
+		//if directory already exists we get error, but we need just skip this action, not panic
+		if err := os.Mkdir(k, os.ModePerm); err != nil && !os.IsExist(err) {
+			log.Fatalf("Cannot create directory for policies: %s", err)
+		}
+		for c := range readerChan {
+			marshaledPolicies, err := json.Marshal(&c)
+			if err != nil {
+				log.Fatalf("Cannot marshal policy '%s' : %s", c.Name, err)
+			}
+			newName := ReplaceRuneWith(c.Name, ':', '_')
+			if err = ioutil.WriteFile(k+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
+				log.Fatalf("Cannot save json file for policy '%s': %s", c.Name, err)
+			}
+
+		}
+	}
+
 	log.Printf("Successfully parsed and saved")
 }
 

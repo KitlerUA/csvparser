@@ -26,7 +26,7 @@ func main() {
 	if len(os.Args) > 1 {
 		go parser.Parse(os.Args[1], ',', readerChan, errorChan)
 	} else {
-		log.Printf("No argument for filename. Use default filename")
+		log.Printf("No argument for filename. Used default filename '%s'", defaultCSVFileName)
 		go parser.Parse(defaultCSVFileName, ',', readerChan, errorChan)
 	}
 	//wait for error
@@ -34,15 +34,15 @@ func main() {
 		log.Printf("Get parse error: %s", err)
 		return
 	}
-
-	uniquePolicies := make(map[string]struct{})
+	//policy and row (where policy was found)
+	uniquePolicies := make(map[string]int)
 	//if error == nil - just start receive Policies
 	for c := range readerChan {
-		if _, ok := uniquePolicies[c.Name]; ok {
-			log.Printf("Find duplicate for policy '%s' on row %d. Skipped", c.Name, c.Row)
+		if k, ok := uniquePolicies[c.Name]; ok {
+			log.Printf("Find duplicate for policy '%s' on rows %d and %d. Skipping %d", c.Name, k, c.Row, c.Row)
 			continue
 		}
-		uniquePolicies[c.Name] = struct{}{}
+		uniquePolicies[c.Name] = c.Row
 		marshaledPolicies, err := json.Marshal(&c)
 		if err != nil {
 			log.Printf("Cannot marshal csv: %s", err)

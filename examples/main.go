@@ -35,7 +35,10 @@ func main() {
 	}
 	//policy and row (where policy was found)
 	uniquePolicies := make(map[string]int)
-	//if error == nil - just start receive Policies
+	//if directory already exists we get error, but we need just skip this action, not panic
+	if err := os.Mkdir(directoryNameForJSONs, os.ModePerm); err != nil && !os.IsExist(err) {
+		log.Fatalf("Cannot create directory for policies: %s", err)
+	}
 	for c := range readerChan {
 		if k, ok := uniquePolicies[c.Name]; ok {
 			log.Printf("Find duplicate for policy '%s' on rows %d and %d. Skipping %d", c.Name, k+1, c.Row+1, c.Row+1)
@@ -44,18 +47,15 @@ func main() {
 		uniquePolicies[c.Name] = c.Row
 		marshaledPolicies, err := json.Marshal(&c)
 		if err != nil {
-			log.Printf("Cannot marshal csv: %s", err)
-			return
+			log.Fatalf("Cannot marshal policy '%s' : %s", c.Name, err)
 		}
 		newName := ReplaceRuneWith(c.Name, ':', '_')
-		os.Mkdir(directoryNameForJSONs, os.ModePerm)
 		if err = ioutil.WriteFile(directoryNameForJSONs+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
-			log.Printf("Cannot save json file: %s", err)
-			return
+			log.Fatalf("Cannot save json file for policy '%s': %s", c.Name, err)
 		}
 
 	}
-
+	log.Printf("Successfully parsed and saved")
 }
 
 //ReplaceRuneWith - return copy of string with changed rune1 to rune2

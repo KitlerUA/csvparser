@@ -8,11 +8,8 @@ import (
 	"github.com/KitlerUA/CSVParser/policy"
 )
 
-type Parser struct {
-}
-
 //Parse - return slice of policies from given .csv file
-func (p *Parser) Parse(fileName string, delimiter rune, c chan policy.Policy, cErr chan error) {
+func Parse(fileName string, delimiter rune, c chan policy.Policy, cErr chan error) {
 	defer close(c)
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0666)
 	if err != nil {
@@ -49,7 +46,6 @@ func (p *Parser) Parse(fileName string, delimiter rune, c chan policy.Policy, cE
 		}
 		//parse actions
 		temp.Actions = strings.Split(records[i][3], string(delimiter))
-		//removeEmptyAndSpaces(&temp.Actions)
 		for i := len(temp.Actions) - 1; i >= 0; i-- {
 			temp.Actions[i] = strings.TrimSpace(temp.Actions[i])
 			if temp.Actions[i] == "" {

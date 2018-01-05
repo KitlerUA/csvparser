@@ -9,7 +9,7 @@ import (
 
 	"bytes"
 
-	"github.com/KitlerUA/CSVParser/csvparser"
+	parser "github.com/KitlerUA/CSVParser/csvparser"
 	"github.com/KitlerUA/CSVParser/policy"
 )
 
@@ -17,7 +17,6 @@ const defaultCSVFileName = "policies.csv"
 const directoryNameForJSONs = "Policies"
 
 func main() {
-	parser := csvparser.Parser{}
 	//channel for getting Policies from parser.Parse
 	readerChan := make(chan policy.Policy, 4)
 	//channels for getting error from parser.Parse

@@ -28,11 +28,8 @@ func Parse(fileName string, delimiter rune, c chan policy.Policy, cErr chan erro
 		temp := policy.Policy{
 			Name:        records[i][0],
 			Description: records[i][1],
-			Subjects:    []string{},
-			Actions:     []string{},
 			Conditions:  policy.Condition{},
 			Effect:      records[i][4],
-			Resources:   []string{},
 			Row:         i,
 		}
 		//parse subjects

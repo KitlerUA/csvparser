@@ -12,5 +12,5 @@ type Policy struct {
 	Conditions  Condition `json:"conditions"`
 	Resources   []string  `json:"resources"`
 
-	Row int
+	Row int `json:"-"`
 }

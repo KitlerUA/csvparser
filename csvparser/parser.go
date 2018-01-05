@@ -16,20 +16,20 @@ func Parse(records [][]string, c chan policy.Policy) {
 	//log.Printf("%d", len(records[0]))
 	for j := 2; j > 0 && j < len(records[0]); j++ {
 		temp_sc1 := policy.Policy{
-			Name:        records[0][j] + "_pz",
+			Name:        "pn:fac:pz:" + strings.ToLower(records[0][j]) + " --need to be fixed",
 			Description: "",
-			Subjects:    []string{records[0][j]},
+			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
-			Resources:   []string{"pz"},
+			Resources:   []string{"rn:pz"},
 		}
 		temp_sc2 := policy.Policy{
-			Name:        records[0][j] + "_pc",
+			Name:        "pn:fac:pc:" + strings.ToLower(records[0][j]) + " --need to be fixed",
 			Description: "",
-			Subjects:    []string{records[0][j]},
+			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
-			Resources:   []string{"pc"},
+			Resources:   []string{"rn:pc"},
 		}
 		for i := range records {
 			if i == 0 {

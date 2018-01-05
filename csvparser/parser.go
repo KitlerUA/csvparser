@@ -14,7 +14,7 @@ const (
 func Parse(records [][]string, c chan policy.Policy) {
 	defer close(c)
 	//log.Printf("%d", len(records[0]))
-	for j := 2; j > 0 && j < len(records[0])-3; j++ {
+	for j := 2; j > 0 && j < len(records[0]); j++ {
 		temp_sc1 := policy.Policy{
 			Name:        records[0][j] + "_pz",
 			Description: "",
@@ -29,7 +29,7 @@ func Parse(records [][]string, c chan policy.Policy) {
 			Subjects:    []string{records[0][j]},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
-			Resources:   []string{records[0][j]},
+			Resources:   []string{"pc"},
 		}
 		for i := range records {
 			if i == 0 {
@@ -38,10 +38,13 @@ func Parse(records [][]string, c chan policy.Policy) {
 
 			temp := strings.Split(records[i][0], ",")
 			for k := range temp {
-				if temp[k] == sc1 {
-					temp_sc1.Actions = append(temp_sc1.Actions, records[i][1])
-				} else if temp[k] == sc2 {
-					temp_sc2.Actions = append(temp_sc2.Actions, records[i][1])
+				temp[k] = strings.TrimSpace(temp[k])
+				if records[i][j] == "Yes" {
+					if temp[k] == sc1 {
+						temp_sc1.Actions = append(temp_sc1.Actions, records[i][1])
+					} else if temp[k] == sc2 {
+						temp_sc2.Actions = append(temp_sc2.Actions, records[i][1])
+					}
 				}
 			}
 		}

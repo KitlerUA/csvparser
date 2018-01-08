@@ -15,10 +15,9 @@ import (
 	"github.com/KitlerUA/CSVParser/policy"
 )
 
-const defaultCSVFileName = "List of Actions - Copy.xlsx"
+const defaultCSVFileName = "List of Actions.xlsx"
 
 func main() {
-
 	var m map[string][][]string
 	var err error
 	var ext string

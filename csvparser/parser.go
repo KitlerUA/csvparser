@@ -13,10 +13,10 @@ const (
 
 func Parse(records [][]string, c chan policy.Policy) {
 	defer close(c)
-	//log.Printf("%d", len(records[0]))
+	//first two columns are sources and name of policy
 	for j := 2; j > 0 && j < len(records[0]); j++ {
 		temp_sc1 := policy.Policy{
-			Name:        "pn:fac:pz:" + strings.ToLower(records[0][j]) + " --need to be fixed",
+			Name:        "pn:fac:pz:" + strings.ToLower(records[0][j]),
 			Description: "",
 			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
 			Effect:      "allow",
@@ -24,8 +24,8 @@ func Parse(records [][]string, c chan policy.Policy) {
 			Resources:   []string{"rn:pz"},
 		}
 		temp_sc2 := policy.Policy{
-			Name:        "pn:fac:pc:" + strings.ToLower(records[0][j]) + " --need to be fixed",
-			Description: "",
+			Name:        "pn:fac:pc:" + strings.ToLower(records[0][j]),
+			Description: "--need to be fixed",
 			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
@@ -35,7 +35,7 @@ func Parse(records [][]string, c chan policy.Policy) {
 			if i == 0 {
 				continue
 			}
-
+			//find sources (may be 1 or 2 sources in one cell)
 			temp := strings.Split(records[i][0], ",")
 			for k := range temp {
 				temp[k] = strings.TrimSpace(temp[k])

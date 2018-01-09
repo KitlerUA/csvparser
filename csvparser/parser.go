@@ -19,15 +19,15 @@ func Parse(records [][]string, c chan policy.Policy) {
 		tempSc1 := policy.Policy{
 			Name:        "pn:fac:pz:" + strings.ToLower(records[0][j]),
 			Description: "",
-			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
+			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j])},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
 			Resources:   []string{"rn:pz"},
 		}
 		tempSc2 := policy.Policy{
 			Name:        "pn:fac:pc:" + strings.ToLower(records[0][j]),
-			Description: "--need to be fixed",
-			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
+			Description: "",
+			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j])},
 			Effect:      "allow",
 			Conditions:  policy.Condition{},
 			Resources:   []string{"rn:pc"},
@@ -40,7 +40,7 @@ func Parse(records [][]string, c chan policy.Policy) {
 			temp := strings.Split(records[i][0], ",")
 			for k := range temp {
 				temp[k] = strings.TrimSpace(temp[k])
-				if records[i][j] == "Yes" {
+				if strings.ToLower(records[i][j]) == strings.ToLower("Yes") {
 					if temp[k] == sc1 {
 						tempSc1.Actions = append(tempSc1.Actions, records[i][1])
 					} else if temp[k] == sc2 {

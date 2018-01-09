@@ -50,7 +50,7 @@ func XLSX(fileName string) (map[string][][]string, error) {
 		}
 		//check if all headers was found
 		if !(pageFound && nameFound && rolesFound) {
-			log.Printf("Cannot find %s, %s or at least one of the roles in firs row of '%s' sheet", config.Get().Page, config.Get().Name, sheet.Name)
+			log.Printf("Cannot find %s, %s or at least one of the roles in first row of '%s' sheet", config.Get().Page, config.Get().Name, sheet.Name)
 			continue
 		}
 		//create new record in map after all checks

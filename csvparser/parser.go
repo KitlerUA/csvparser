@@ -3,7 +3,7 @@ package csvparser
 import (
 	"strings"
 
-	"github.com/KitlerUA/CSVParser/policy"
+	"github.com/KitlerUA/csvparser/policy"
 )
 
 const (

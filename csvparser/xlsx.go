@@ -5,7 +5,7 @@ import (
 
 	"log"
 
-	"github.com/KitlerUA/CSVParser/config"
+	"github.com/KitlerUA/csvparser/config"
 	"github.com/tealeg/xlsx"
 )
 

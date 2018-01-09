@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/KitlerUA/CSVParser/parser"
+	"github.com/KitlerUA/csvparser/parser"
 )
 
 const defaultCSVFileName = "List of Actions.xlsx"

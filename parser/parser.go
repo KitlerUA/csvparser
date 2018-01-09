@@ -11,8 +11,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/KitlerUA/CSVParser/csvparser"
-	"github.com/KitlerUA/CSVParser/policy"
+	"github.com/KitlerUA/csvparser/csvparser"
+	"github.com/KitlerUA/csvparser/policy"
 )
 
 func Parse(fileName, dir string) error {

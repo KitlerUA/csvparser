@@ -15,7 +15,7 @@ func Parse(records [][]string, c chan policy.Policy) {
 	defer close(c)
 	//first two columns are sources and name of policy
 	for j := 2; j > 0 && j < len(records[0]); j++ {
-		temp_sc1 := policy.Policy{
+		tempSc1 := policy.Policy{
 			Name:        "pn:fac:pz:" + strings.ToLower(records[0][j]),
 			Description: "",
 			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
@@ -23,7 +23,7 @@ func Parse(records [][]string, c chan policy.Policy) {
 			Conditions:  policy.Condition{},
 			Resources:   []string{"rn:pz"},
 		}
-		temp_sc2 := policy.Policy{
+		tempSc2 := policy.Policy{
 			Name:        "pn:fac:pc:" + strings.ToLower(records[0][j]),
 			Description: "--need to be fixed",
 			Subjects:    []string{"gn:fac:" + strings.ToLower(records[0][j]) + " --need to be fixed"},
@@ -41,14 +41,14 @@ func Parse(records [][]string, c chan policy.Policy) {
 				temp[k] = strings.TrimSpace(temp[k])
 				if records[i][j] == "Yes" {
 					if temp[k] == sc1 {
-						temp_sc1.Actions = append(temp_sc1.Actions, records[i][1])
+						tempSc1.Actions = append(tempSc1.Actions, records[i][1])
 					} else if temp[k] == sc2 {
-						temp_sc2.Actions = append(temp_sc2.Actions, records[i][1])
+						tempSc2.Actions = append(tempSc2.Actions, records[i][1])
 					}
 				}
 			}
 		}
-		c <- temp_sc1
-		c <- temp_sc2
+		c <- tempSc1
+		c <- tempSc2
 	}
 }

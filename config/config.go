@@ -4,25 +4,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"strings"
 	"sync"
 )
 
-type Index struct {
-	Page      int
-	Name      int
-	RoleStart int
-	RoleEnd   int
-}
-
-type IndexString struct {
-	Page      string `json:"page"`
-	Name      string `json:"name"`
-	RoleStart string `json:"role_start"`
-	RoleEnd   string `json:"role_end"`
-}
-
 type Config struct {
-	Indices map[string]Index
+	Page  string
+	Name  string
+	Roles []string
 }
 
 var config *Config
@@ -33,41 +22,25 @@ func Get() Config {
 	return *config
 }
 
-var loadConfig = func() {
+func loadConfig() {
 	data, err := ioutil.ReadFile("config.json")
 	if err != nil {
-		log.Fatalf("Cannot load config file: %s", err)
+		log.Fatalf("Cannot find config file: %s", err)
 	}
-	temp := struct {
-		Indices map[string]struct {
-			Page      string `json:"page"`
-			Name      string `json:"name"`
-			RoleStart string `json:"role_start"`
-			RoleEnd   string `json:"role_end"`
-		} `json:"indices"`
-	}{}
-	if err = json.Unmarshal(data, &temp); err != nil {
-		log.Fatalf("Config file corrupted: %s", err)
+	config = &Config{
+		Page: "Page",
+		Name: "Policy technical Action Name",
 	}
-	config = &Config{Indices: make(map[string]Index)}
-	for k, v := range temp.Indices {
-		(*config).Indices[k] = Index{
-			Page:      stringIndexToInt(v.Page),
-			Name:      stringIndexToInt(v.Name),
-			RoleStart: stringIndexToInt(v.RoleStart),
-			RoleEnd:   stringIndexToInt(v.RoleEnd),
-		}
+	if err = json.Unmarshal(data, &config.Roles); err != nil {
+		log.Fatalf("Corrupted data in config file: %s", err)
 	}
 }
 
-func stringIndexToInt(index string) int {
-	var res int
-	for i, r := range index {
-		if i == 0 {
-			res += int(r - 'A')
-		} else {
-			res += int(r - 'A' + 1)
+func (c Config) ContainsRole(role string) bool {
+	for _, r := range c.Roles {
+		if strings.ToLower(r) == strings.ToLower(role) {
+			return true
 		}
 	}
-	return res
+	return false
 }

@@ -9,6 +9,9 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
+//XLSX - read data from .xlsx file and
+//return map with key=sheet.Name and matrix of values
+//read until first empty row
 func XLSX(fileName string) (map[string][][]string, error) {
 	xlFile, err := xlsx.OpenFile(fileName)
 	if err != nil {

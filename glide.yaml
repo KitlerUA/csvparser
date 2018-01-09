@@ -1,0 +1,3 @@
+package: github.com/KitlerUA/csvparser
+import:
+- package: github.com/tealeg/xlsx

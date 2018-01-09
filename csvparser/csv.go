@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//CSV - read data from .csv file and return map with one key (fileName) and matrix of values
 func CSV(fileName string, delimiter rune) (map[string][][]string, error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0666)
 	if err != nil {

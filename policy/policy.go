@@ -1,8 +1,10 @@
 package policy
 
+//Condition - represent conditions
 type Condition struct {
 }
 
+//Policy - represent structure for policies
 type Policy struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`

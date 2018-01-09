@@ -11,6 +11,7 @@ const (
 	sc2 = "SC2"
 )
 
+//Parse - read matrix of values and send Policies to the channel
 func Parse(records [][]string, c chan policy.Policy) {
 	defer close(c)
 	//first two columns are sources and name of policy

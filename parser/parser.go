@@ -41,7 +41,7 @@ func Parse(fileName, dir string) error {
 		readerChan := make(chan policy.Policy, 4)
 		go csvparser.Parse(m[k], readerChan)
 		//if directory already exists we get error, but we need just skip this action, not panic
-		if err := os.Mkdir(k, os.ModePerm); err != nil && !os.IsExist(err) {
+		if err := os.Mkdir(dir+k, os.ModePerm); err != nil && !os.IsExist(err) {
 			return fmt.Errorf("cannot create directory for policies: %s", err)
 		}
 		for c := range readerChan {

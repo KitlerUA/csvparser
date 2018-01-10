@@ -18,14 +18,17 @@ import (
 
 //Parse - read and parse file with fileName
 //write results to dir
-func Parse(fileName, dir string) error {
+//also returns warning message
+func Parse(fileName, dir string) (error, string) {
+	var warn string
 	cErr := make(chan error)
 	go config.Init(cErr)
 	if e := <-cErr; e != nil {
-		return e
+		return e, ""
 	}
 	var (
 		m   map[string][][]string
+		b   map[string][][]string
 		err error
 		ext string
 	)
@@ -34,36 +37,46 @@ func Parse(fileName, dir string) error {
 
 	switch ext {
 	case ".xlsx":
-		m, err = csvparser.XLSX(fileName)
+		m, b, err = csvparser.XLSX(fileName)
 		if err != nil {
-			return fmt.Errorf("cannot parse xlsx: %s", err)
+			return fmt.Errorf("cannot parse xlsx: %s", err), ""
 		}
 	default:
-		return fmt.Errorf("format of file isn`t supported")
+		return fmt.Errorf("format of file isn`t supported"), ""
 	}
 
 	for k := range m {
 		//channel for getting Policies from parser.Parse
 		readerChan := make(chan policy.Policy, 4)
-		go csvparser.Parse(m[k], readerChan)
+		warnChan := make(chan string, 4)
+		quitChan := make(chan struct{})
+		go csvparser.Parse(m[k], b[k], readerChan, warnChan, quitChan)
 		//if directory already exists we get error, but we need just skip this action, not panic
 		dirName := dir + time.Now().Format("2006-01-02_15-04-05") + "_" + k
 		if err := os.Mkdir(dirName, os.ModePerm); err != nil && !os.IsExist(err) {
-			return fmt.Errorf("cannot create directory for policies: %s", err)
+			return fmt.Errorf("cannot create directory for policies: %s", err), ""
 		}
-		for c := range readerChan {
-			marshaledPolicies, err := json.Marshal(&c)
-			if err != nil {
-				return fmt.Errorf("cannot marshal policy '%s' : %s", c.Name, err)
+	Listner:
+		for {
+			select {
+			case c := <-readerChan:
+				marshaledPolicies, err := json.Marshal(&c)
+				if err != nil {
+					return fmt.Errorf("cannot marshal policy '%s' : %s", c.Name, err), ""
+				}
+				newName := ReplaceRuneWith(c.Name, ':', '_')
+				if err = ioutil.WriteFile(dirName+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
+					return fmt.Errorf("cannot save json file for policy '%s': %s", c.Name, err), ""
+				}
+			case w := <-warnChan:
+				warn += k + ": " + w + "\n"
+			case <-quitChan:
+				break Listner
 			}
-			newName := ReplaceRuneWith(c.Name, ':', '_')
-			if err = ioutil.WriteFile(dirName+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
-				return fmt.Errorf("cannot save json file for policy '%s': %s", c.Name, err)
-			}
+		}
 
-		}
 	}
-	return nil
+	return nil, warn
 }
 
 //ReplaceRuneWith - return copy of string with changed rune1 to rune2

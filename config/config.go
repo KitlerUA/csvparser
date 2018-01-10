@@ -9,10 +9,13 @@ import (
 
 //Config - contains some configuration data
 type Config struct {
-	Page       string `json:"page"`
-	Name       string `json:"policy_name"`
-	RolesBegin string `json:"roles_begin"`
-	RolesEnd   string `json:"roles_end"`
+	Page          string `json:"page"`
+	Name          string `json:"policy_name"`
+	RolesBegin    string `json:"roles_begin"`
+	RolesEnd      string `json:"roles_end"`
+	Type          string `json:"type"`
+	TechGroupName string `json:"technical_group_name"`
+	DisplayName   string `json:"display_name"`
 }
 
 var config *Config

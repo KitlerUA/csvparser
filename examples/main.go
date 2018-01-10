@@ -9,8 +9,14 @@ import (
 const defaultCSVFileName = "List of Actions.xlsx"
 
 func main() {
-	if err := parser.Parse(defaultCSVFileName, ""); err != nil {
+	var warnings string
+	var err error
+	if err, warnings = parser.Parse(defaultCSVFileName, ""); err != nil {
 		log.Fatalf("%s", err)
 	}
-	log.Printf("Successfully parsed and saved")
+	if warnings != "" {
+		log.Printf("Parsed with warnings:\n%s", warnings)
+	} else {
+		log.Printf("Successfully parsed and saved")
+	}
 }

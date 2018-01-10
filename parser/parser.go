@@ -11,6 +11,7 @@ import (
 
 	"time"
 
+	"github.com/KitlerUA/csvparser/config"
 	"github.com/KitlerUA/csvparser/csvparser"
 	"github.com/KitlerUA/csvparser/policy"
 )
@@ -18,6 +19,11 @@ import (
 //Parse - read and parse file with fileName
 //write results to dir
 func Parse(fileName, dir string) error {
+	cErr := make(chan error)
+	go config.Init(cErr)
+	if e := <-cErr; e != nil {
+		return e
+	}
 	var (
 		m   map[string][][]string
 		err error
@@ -43,7 +49,7 @@ func Parse(fileName, dir string) error {
 		readerChan := make(chan policy.Policy, 4)
 		go csvparser.Parse(m[k], readerChan)
 		//if directory already exists we get error, but we need just skip this action, not panic
-		dirName := dir + time.Now().Format("2006-01-02_15_04_05") + "-" + k
+		dirName := dir + time.Now().Format("2006-01-02_15-04-05") + "_" + k
 		if err := os.Mkdir(dirName, os.ModePerm); err != nil && !os.IsExist(err) {
 			return fmt.Errorf("cannot create directory for policies: %s", err)
 		}

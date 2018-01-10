@@ -41,8 +41,11 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 		} else {
 			tempSc1.Subjects[0] = bindings[j-2][1]
 			tempSc1.Description = bindings[j-2][2]
+			names := strings.Split(bindings[j-2][1], ":")
+			tempSc1.Name = "pn:fac:pz:" + strings.ToLower(names[len(names)-1])
 			tempSc2.Subjects[0] = bindings[j-2][1]
 			tempSc2.Description = bindings[j-2][2]
+			tempSc2.Name = "pn:fac:pc:" + strings.ToLower(names[len(names)-1])
 		}
 		for i := range records {
 			if i == 0 {

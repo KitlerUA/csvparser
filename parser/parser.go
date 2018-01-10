@@ -56,7 +56,7 @@ func Parse(fileName, dir string) (error, string) {
 		if err := os.Mkdir(dirName, os.ModePerm); err != nil && !os.IsExist(err) {
 			return fmt.Errorf("cannot create directory for policies: %s", err), ""
 		}
-	Listner:
+	Listener:
 		for {
 			select {
 			case c := <-readerChan:
@@ -71,7 +71,7 @@ func Parse(fileName, dir string) (error, string) {
 			case w := <-warnChan:
 				warn += k + ": " + w + "\n"
 			case <-quitChan:
-				break Listner
+				break Listener
 			}
 		}
 

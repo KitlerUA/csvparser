@@ -30,9 +30,14 @@ func XLSX(fileName string) (map[string][][]string, error) {
 			//index of Name column
 			name      int
 			nameFound = false
-			////indices of Roles columns
-			roles      []int
-			rolesFound = false
+			//indices of Roles columns
+			//roles      []int
+			//rolesFound = false
+			//indices for roles_start and roles_end
+			rolesStart      int
+			rolesStartFound = false
+			rolesEnd        int
+			rolesEndFound   = false
 		)
 		//search for "page", "name" and "roles" in first row
 		row := sheet.Rows[0]
@@ -43,19 +48,20 @@ func XLSX(fileName string) (map[string][][]string, error) {
 			} else if strings.ToLower(cell.String()) == strings.ToLower(config.Get().Name) {
 				name = j
 				nameFound = true
-			} else if config.Get().ContainsRole(strings.ToLower(cell.String())) {
-				roles = append(roles, j)
-				rolesFound = true
+			} else if strings.ToLower(cell.String()) == strings.ToLower(config.Get().RolesBegin) {
+				rolesStart = j + 1
+				rolesStartFound = true
+			} else if strings.ToLower(cell.String()) == strings.ToLower(config.Get().RolesEnd) {
+				rolesEnd = j - 1
+				rolesEndFound = true
 			}
 		}
 		//check if all headers was found
-		if !(pageFound && nameFound && rolesFound) {
-			log.Printf("Cannot find %s, %s or at least one of the roles in first row of '%s' sheet", config.Get().Page, config.Get().Name, sheet.Name)
+		if !(pageFound && nameFound && rolesStartFound && rolesEndFound) {
+			log.Printf("Cannot find %s, %s or bounds fore roles in '%s' sheet", config.Get().Page, config.Get().Name, sheet.Name)
 			continue
 		}
 		//create new record in map after all checks
-		res[sheet.Name] = make([][]string, 0)
-		//add record for this sheet
 		res[sheet.Name] = make([][]string, 0)
 		for i, row := range sheet.Rows {
 			//first empty row mean the end of the table
@@ -69,8 +75,8 @@ func XLSX(fileName string) (map[string][][]string, error) {
 			//insert Name
 			res[sheet.Name][i] = append(res[sheet.Name][i], row.Cells[name].String())
 			//insert Roles
-			for _, r := range roles {
-				res[sheet.Name][i] = append(res[sheet.Name][i], row.Cells[r].String())
+			for j := rolesStart; j <= rolesEnd; j++ {
+				res[sheet.Name][i] = append(res[sheet.Name][i], row.Cells[j].String())
 			}
 		}
 	}

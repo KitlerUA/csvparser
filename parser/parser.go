@@ -32,18 +32,16 @@ func Parse(fileName, dir string) error {
 
 	ext = path.Ext(fileName)
 
-	if ext == ".csv" {
-		m, err = csvparser.CSV(fileName, ';')
-		if err != nil {
-			return fmt.Errorf("cannot parse csv: %s", err)
-		}
-	}
-	if ext == ".xlsx" {
+	switch ext {
+	case ".xlsx":
 		m, err = csvparser.XLSX(fileName)
 		if err != nil {
 			return fmt.Errorf("cannot parse xlsx: %s", err)
 		}
+	default:
+		return fmt.Errorf("format of file isn`t supported")
 	}
+
 	for k := range m {
 		//channel for getting Policies from parser.Parse
 		readerChan := make(chan policy.Policy, 4)

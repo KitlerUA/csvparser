@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 
 	"fmt"
 
@@ -20,6 +21,13 @@ import (
 //write results to dir
 //also returns warning message
 func Parse(fileName, dir string) (error, string) {
+	if dir == "" {
+		var err error
+		if dir, err = filepath.Abs(filepath.Dir(os.Args[0])); err != nil {
+			return err, ""
+		}
+		dir += "/"
+	}
 	var warn string
 	cErr := make(chan error)
 	go config.Init(cErr)

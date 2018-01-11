@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -37,7 +39,8 @@ func Get() Config {
 }
 
 func loadConfig() error {
-	data, err := ioutil.ReadFile("config.json")
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	data, err := ioutil.ReadFile(dir + "/config.json")
 	if err != nil {
 		return fmt.Errorf("cannot find config file: %s\nPlease, add config file and restart program", err)
 	}

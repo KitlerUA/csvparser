@@ -5,6 +5,8 @@ import (
 
 	"fmt"
 
+	"time"
+
 	"github.com/KitlerUA/csvparser/policy"
 )
 
@@ -16,6 +18,7 @@ const (
 //Parse - read matrix of values and send Policies to the channel
 func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan string, q chan struct{}) {
 	defer func() {
+		time.Sleep(100 * time.Millisecond)
 		q <- struct{}{}
 	}()
 	//first two columns are sources and name of policy
@@ -42,10 +45,10 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 			tempSc1.Subjects[0] = bindings[j-2][1]
 			tempSc1.Description = bindings[j-2][2]
 			names := strings.Split(bindings[j-2][1], ":")
-			tempSc1.Name = "pn:fac:pz:" + strings.ToLower(names[len(names)-1])
+			tempSc1.Name = "pn:" + strings.ToLower(bindings[j-2][0]) + ":pz:" + strings.ToLower(names[len(names)-1])
 			tempSc2.Subjects[0] = bindings[j-2][1]
 			tempSc2.Description = bindings[j-2][2]
-			tempSc2.Name = "pn:fac:pc:" + strings.ToLower(names[len(names)-1])
+			tempSc2.Name = "pn:" + strings.ToLower(bindings[j-2][0]) + ":pc:" + strings.ToLower(names[len(names)-1])
 		}
 		for i := range records {
 			if i == 0 {

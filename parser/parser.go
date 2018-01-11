@@ -47,8 +47,8 @@ func Parse(fileName, dir string) (error, string) {
 
 	for k := range m {
 		//channel for getting Policies from parser.Parse
-		readerChan := make(chan policy.Policy, 4)
-		warnChan := make(chan string, 4)
+		readerChan := make(chan policy.Policy)
+		warnChan := make(chan string)
 		quitChan := make(chan struct{})
 		go csvparser.Parse(m[k], b[k], readerChan, warnChan, quitChan)
 		//if directory already exists we get error, but we need just skip this action, not panic

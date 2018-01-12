@@ -85,6 +85,12 @@ func Parse(fileName, dir string) (error, string) {
 		}
 
 	}
+	for k := range m {
+		delete(m, k)
+	}
+	for k := range b {
+		delete(b, k)
+	}
 	return nil, warn
 }
 

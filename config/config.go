@@ -6,18 +6,20 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
 //Config - contains some configuration data
 type Config struct {
-	Page          string `json:"page"`
-	Name          string `json:"policy_name"`
-	RolesBegin    string `json:"roles_begin"`
-	RolesEnd      string `json:"roles_end"`
-	Type          string `json:"type"`
-	TechGroupName string `json:"technical_group_name"`
-	DisplayName   string `json:"display_name"`
+	Page          string            `json:"page"`
+	PagesNames    map[string]string `json:"pages_names"`
+	Name          string            `json:"policy_name"`
+	RolesBegin    string            `json:"roles_begin"`
+	RolesEnd      string            `json:"roles_end"`
+	Type          string            `json:"type"`
+	TechGroupName string            `json:"technical_group_name"`
+	DisplayName   string            `json:"display_name"`
 }
 
 var config *Config
@@ -47,6 +49,12 @@ func loadConfig() error {
 	config = &Config{}
 	if err = json.Unmarshal(data, &config); err != nil {
 		return fmt.Errorf("corrupted data in config file: %s\nPlease, correct config and restart program", err)
+	}
+	for i := range config.PagesNames {
+		if _, ok := config.PagesNames[strings.ToLower(i)]; !ok {
+			config.PagesNames[strings.ToLower(i)] = config.PagesNames[i]
+			delete(config.PagesNames, i)
+		}
 	}
 	return nil
 }

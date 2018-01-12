@@ -72,7 +72,7 @@ func Parse(fileName, dir string) (error, string) {
 				if err != nil {
 					return fmt.Errorf("cannot marshal policy '%s' : %s", c.Name, err), ""
 				}
-				newName := ReplaceRuneWith(c.Name, ':', '_')
+				newName := ReplaceRuneWith(c.FileName, ':', '_')
 				newName = ReplaceRuneWith(newName, '*', '_')
 				if err = ioutil.WriteFile(dirName+"/"+newName+".json", marshaledPolicies, 0666); err != nil {
 					return fmt.Errorf("cannot save json file for policy '%s': %s", c.Name, err), ""

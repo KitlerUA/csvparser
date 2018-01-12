@@ -6,7 +6,7 @@ import (
 	"github.com/KitlerUA/csvparser/parser"
 )
 
-const defaultCSVFileName = "List of Actions.xlsx"
+const defaultCSVFileName = "List of Actions Test2.xlsx"
 
 func main() {
 	var warnings string

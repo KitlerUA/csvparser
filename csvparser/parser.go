@@ -27,6 +27,12 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 	prefLen := 2
 	//current binding position
 	curBind := 0
+	//empty page errors
+	emptyErrors := make(map[int]struct{})
+	//missing sources in config
+	misErrors := make(map[string]map[int]struct{})
+	//missing binding names
+	bindErrors := make(map[string]struct{})
 	//first two columns are sources and name of policy
 	for j := prefLen; j > 0 && j < len(records[0]); j++ {
 		srcPol := make(map[string]*policy.Policy)
@@ -36,17 +42,20 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 			for s := range sources {
 				src := strings.ToLower(strings.TrimSpace(sources[s]))
 				if src == "" {
-					w <- fmt.Sprintf("found empty page on row %d", i+1)
+					emptyErrors[i+1] = struct{}{}
 					continue
 				}
 				//check if source in config list
 				if _, ok := config.Get().PagesNames[src]; !ok {
-					w <- fmt.Sprintf("page '%s' (row %d) isn't in config file: skipped", src, i+1)
+					if _, ok := misErrors[src]; !ok {
+						misErrors[src] = make(map[int]struct{})
+					}
+					misErrors[src][i+1] = struct{}{}
 					continue
 				}
 				//if record for source doesn't exist - create
 				if _, ok := srcPol[src]; !ok {
-					var name, description, subject string
+					var name, description, subject, fileName string
 
 					//take info from table, otherwise - send warning and set fields 'missing value'
 					if curBind < len(bindings) {
@@ -54,11 +63,14 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 						name = fmt.Sprintf("pn:%s:%s:%s", strings.ToLower(bindings[curBind][0]), strings.ToLower(config.Get().PagesNames[src]), strings.ToLower(names[len(names)-1]))
 						description = bindings[curBind][2]
 						subject = bindings[curBind][1]
+						fileName = fmt.Sprintf("%s_%s", strings.ToLower(names[len(names)-1]), config.Get().PagesNames[src])
+
 					} else {
-						w <- fmt.Sprintf("cannot find binding name for '%s'", strings.ToLower(records[0][j]))
-						name = missing
+						bindErrors[strings.ToLower(records[0][j])] = struct{}{}
+						name = fmt.Sprintf("%s:%s", strings.ToLower(records[0][j]), missing)
 						description = missing
 						subject = missing
+						fileName = fmt.Sprintf("%s_%s", strings.ToLower(records[0][j]), missing)
 					}
 					srcPol[src] = &policy.Policy{
 						Name:        name,
@@ -68,6 +80,7 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 						Conditions:  policy.Condition{},
 						Resources:   []string{fmt.Sprintf("rn:%s", strings.ToLower(config.Get().PagesNames[src]))},
 						Actions:     make([]string, 0),
+						FileName:    fileName,
 					}
 				}
 				if strings.ToLower(records[i][j]) == strings.ToLower("Yes") {
@@ -79,5 +92,16 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 			c <- *v
 		}
 		curBind++
+	}
+	for i := range bindErrors {
+		w <- fmt.Sprintf("cannot find binding name for '%s'", i)
+	}
+	for i := range emptyErrors {
+		w <- fmt.Sprintf("found empty page-field on row %d", i)
+	}
+	for s := range misErrors {
+		for r := range misErrors[s] {
+			w <- fmt.Sprintf("page '%s' (row %d) isn't in config file: skipped", s, r)
+		}
 	}
 }

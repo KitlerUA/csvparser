@@ -10,8 +10,6 @@ import (
 )
 
 const (
-	sc1     = "SC1"
-	sc2     = "SC2"
 	missing = "MISSING"
 )
 

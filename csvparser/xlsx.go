@@ -3,7 +3,7 @@ package csvparser
 import (
 	"strings"
 
-	"log"
+	"fmt"
 
 	"github.com/KitlerUA/csvparser/config"
 	"github.com/tealeg/xlsx"
@@ -12,10 +12,11 @@ import (
 //XLSX - read data from .xlsx file and
 //return map with key=sheet.Name and matrix of values
 //read until first empty row
-func XLSX(fileName string) (map[string][][]string, map[string][][]string, error) {
+func XLSX(fileName string) (map[string][][]string, map[string][][]string, string, error) {
+	warn := ""
 	xlFile, err := xlsx.OpenFile(fileName)
 	if err != nil {
-		return make(map[string][][]string), make(map[string][][]string), err
+		return make(map[string][][]string), make(map[string][][]string), warn, err
 	}
 	res := make(map[string][][]string)
 	bindings := make(map[string][][]string)
@@ -59,7 +60,7 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, error)
 		}
 		//check if all headers was found
 		if !(pageFound && nameFound && rolesStartFound && rolesEndFound) {
-			log.Printf("Cannot find %s, %s or bounds fore roles in '%s' sheet", config.Get().Page, config.Get().Name, sheet.Name)
+			warn += fmt.Sprintf("Cannot find %s, %s or bounds fore roles in '%s' sheet\n", config.Get().Page, config.Get().Name, sheet.Name)
 			continue
 		}
 		//create new record in map after all checks
@@ -81,6 +82,9 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, error)
 			res[sheet.Name][i] = append(res[sheet.Name][i], row.Cells[name].String())
 			//insert Roles
 			for j := rolesStart; j <= rolesEnd; j++ {
+				if rolesEnd >= len(row.Cells) {
+					return make(map[string][][]string), make(map[string][][]string), warn, fmt.Errorf("sheet=%s: find empty tail of row %d\nPlease, fix action's table", sheet.Name, i)
+				}
 				res[sheet.Name][i] = append(res[sheet.Name][i], row.Cells[j].String())
 			}
 		}
@@ -104,7 +108,7 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, error)
 
 		}
 	}
-	return res, bindings, nil
+	return res, bindings, warn, nil
 }
 
 func isRowEmpty(row *xlsx.Row) bool {

@@ -51,7 +51,7 @@ func Parse(fileName, dir string) (string, error) {
 			return warn, fmt.Errorf("cannot parse xlsx: %s", err)
 		}
 	default:
-		return warn, fmt.Errorf("format of file isn`t supported")
+		return warn, fmt.Errorf("format of file isn`t supported<br>")
 	}
 
 	for k := range m {
@@ -79,7 +79,7 @@ func Parse(fileName, dir string) (string, error) {
 					return warn, fmt.Errorf("cannot save json file for policy '%s': %s", c.Name, err)
 				}
 			case w := <-warnChan:
-				warn += fmt.Sprintf("<u>%s</u>: %s<br>", k, w)
+				warn += fmt.Sprintf("<b>%s</b>: %s<br>", k, w)
 			case <-quitChan:
 				break Listener
 			}

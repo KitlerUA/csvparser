@@ -25,6 +25,8 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 	prefLen := 2
 	//current binding position
 	curBind := 0
+	//empty column header error
+	headerErrors := make(map[int]struct{})
 	//empty page errors
 	emptyErrors := make(map[int]struct{})
 	//missing sources in config
@@ -33,6 +35,11 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 	bindErrors := make(map[string]struct{})
 	//first two columns are sources and name of policy
 	for j := prefLen; j > 0 && j < len(records[0]); j++ {
+		//check header of column, if empty - skipp column
+		if records[0][j] == "" {
+			headerErrors[j] = struct{}{}
+			continue
+		}
 		srcPol := make(map[string]*policy.Policy)
 		//walk down to collect info about actions and form policy for all role-sources pair for current role
 		for i := 1; i < len(records); i++ {
@@ -90,6 +97,9 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 			c <- *v
 		}
 		curBind++
+	}
+	for i := range headerErrors {
+		w <- fmt.Sprintf("find empty role-header on %d position", i-prefLen+1)
 	}
 	for i := range bindErrors {
 		w <- fmt.Sprintf("cannot find binding name for '%s'", i)

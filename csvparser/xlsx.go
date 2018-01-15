@@ -32,9 +32,6 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, string
 			//index of Name column
 			name      int
 			nameFound = false
-			//indices of Roles columns
-			//roles      []int
-			//rolesFound = false
 			//indices for roles_start and roles_end
 			rolesStart      int
 			rolesStartFound = false

@@ -11,7 +11,7 @@ const defaultCSVFileName = "List of Actions Test2.xlsx"
 func main() {
 	var warnings string
 	var err error
-	if err, warnings = parser.Parse(defaultCSVFileName, ""); err != nil {
+	if warnings, err = parser.Parse(defaultCSVFileName, ""); err != nil {
 		log.Fatalf("%s", err)
 	}
 	if warnings != "" {

@@ -99,7 +99,7 @@ func Parse(records [][]string, bindings [][]string, c chan policy.Policy, w chan
 		curBind++
 	}
 	for i := range headerErrors {
-		w <- fmt.Sprintf("find empty role-header on %d position", i-prefLen+1)
+		w <- fmt.Sprintf("find empty role-header on %d-th position", i-prefLen+1)
 	}
 	for i := range bindErrors {
 		w <- fmt.Sprintf("cannot find binding name for '%s'", i)

@@ -57,7 +57,7 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, string
 		}
 		//check if all headers was found
 		if !(pageFound && nameFound && rolesStartFound && rolesEndFound) {
-			warn += fmt.Sprintf("Cannot find %s, %s or bounds fore roles in '%s' sheet\n", config.Get().Page, config.Get().Name, sheet.Name)
+			warn += fmt.Sprintf("%s: cannot find %s, %s or bounds for roles\n", sheet.Name, config.Get().Page, config.Get().Name)
 			continue
 		}
 		//create new record in map after all checks
@@ -95,7 +95,7 @@ func XLSX(fileName string) (map[string][][]string, map[string][][]string, string
 					strings.ToLower(cell1) == strings.ToLower(config.Get().TechGroupName) &&
 					strings.ToLower(cell2) == strings.ToLower(config.Get().DisplayName) {
 					for r := i + 1; r < len(sheet.Rows); r++ {
-						if isPartRowEmpty(sheet.Rows[r], j, j+2) {
+						if isPartRowEmpty(sheet.Rows[r], j, j+2) || len(sheet.Rows[r].Cells)-1 < j+2 {
 							break
 						}
 						bindings[sheet.Name] = append(bindings[sheet.Name], []string{sheet.Rows[r].Cells[j].String(), sheet.Rows[r].Cells[j+1].String(), sheet.Rows[r].Cells[j+2].String()})

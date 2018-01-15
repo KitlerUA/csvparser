@@ -79,7 +79,7 @@ func Parse(fileName, dir string) (string, error) {
 					return warn, fmt.Errorf("cannot save json file for policy '%s': %s", c.Name, err)
 				}
 			case w := <-warnChan:
-				warn += fmt.Sprintf("%s: %s\n", k, w)
+				warn += fmt.Sprintf("<u>%s</u>: %s<br>", k, w)
 			case <-quitChan:
 				break Listener
 			}

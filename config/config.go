@@ -44,11 +44,11 @@ func loadConfig() error {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	data, err := ioutil.ReadFile(dir + "/config.json")
 	if err != nil {
-		return fmt.Errorf("cannot find config file: %s\nPlease, add config file and restart program", err)
+		return fmt.Errorf("cannot find config file: %s<br>Please, add config file and restart program", err)
 	}
 	config = &Config{}
 	if err = json.Unmarshal(data, &config); err != nil {
-		return fmt.Errorf("corrupted data in config file: %s\nPlease, correct config and restart program", err)
+		return fmt.Errorf("corrupted data in config file: %s<br>Please, fix config and restart program", err)
 	}
 	for i := range config.PagesNames {
 		if _, ok := config.PagesNames[strings.ToLower(i)]; !ok {

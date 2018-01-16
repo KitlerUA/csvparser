@@ -28,6 +28,10 @@ func Parse(fileName, dir string) (string, error) {
 			return warn, err
 		}
 		dir += "/"
+	} else {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			return warn, err
+		}
 	}
 
 	cErr := make(chan error)

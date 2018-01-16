@@ -55,7 +55,7 @@ func Parse(fileName, dir string) (string, error) {
 			return warn, fmt.Errorf("cannot parse xlsx: %s", err)
 		}
 	default:
-		return warn, fmt.Errorf("format of file isn`t supported<br>")
+		return warn, fmt.Errorf("format of file isn`t supported")
 	}
 
 	for k := range m {

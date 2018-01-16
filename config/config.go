@@ -27,12 +27,12 @@ var once sync.Once
 var e error
 
 //Init - read config from file and send error in given channel
-func Init(cErr chan error) {
+func Init() error {
 	once.Do(func() {
 		config = &Config{}
 		e = loadConfig()
 	})
-	cErr <- e
+	return e
 }
 
 //Get - return copy of config

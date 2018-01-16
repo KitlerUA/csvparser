@@ -34,9 +34,7 @@ func Parse(fileName, dir string) (string, error) {
 		}
 	}
 
-	cErr := make(chan error)
-	go config.Init(cErr)
-	if e := <-cErr; e != nil {
+	if e := config.Init(); e != nil {
 		return warn, e
 	}
 	var (
